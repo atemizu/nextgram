@@ -1,4 +1,7 @@
 // app/page.tsx
+"use client";
+
+import { useEffect, useState, FormEvent } from "react";
 
 type Post = {
   id: number;
@@ -7,11 +10,11 @@ type Post = {
   date: string;
 };
 
-const posts: Post[] = [
+const initialPosts: Post[] = [
   {
     id: 1,
     user: "ochin",
-    text: "これはテスト投稿です。SNS っぽい見た目だけ先に作ってみた。",
+    text: "これはテスト投稿です。SNSっぽい見た目だけ先に作ってみた。",
     date: "2025-01-01",
   },
   {
@@ -41,6 +44,47 @@ const posts: Post[] = [
 ];
 
 export default function HomePage() {
+  const [posts, setPosts] = useState<Post[]>(initialPosts);
+  const [text, setText] = useState("");
+
+  // ブラウザの localStorage から保存済みの投稿を読み込む
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const saved = window.localStorage.getItem("ochin-sns-posts");
+      if (!saved) return;
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) {
+        setPosts(parsed);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
+  // 投稿が変わるたびに localStorage に保存
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem("ochin-sns-posts", JSON.stringify(posts));
+  }, [posts]);
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    const trimmed = text.trim();
+    if (!trimmed) return;
+
+    const newPost: Post = {
+      id: Date.now(),
+      user: "visitor", // ゲストは全部これでOK
+      text: trimmed,
+      date: new Date().toISOString().slice(0, 10),
+    };
+
+    // 新しい投稿を先頭に
+    setPosts([newPost, ...posts]);
+    setText("");
+  };
+
   return (
     <main
       style={{
@@ -69,7 +113,7 @@ export default function HomePage() {
               fontWeight: 700,
             }}
           >
-            おちんSNS（見た目だけ）
+            おちんSNS（見た目＋その場投稿）
           </h1>
           <p
             style={{
@@ -78,46 +122,9 @@ export default function HomePage() {
               marginTop: "4px",
             }}
           >
-            これはただのダミータイムラインです。本物っぽさだけ楽しんでください。
+            投稿すると、このブラウザの中だけでタイムラインに追加されます。
+            他の人の画面にはまだ反映されない、ゆるいSNSごっこです。
           </p>
         </header>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          {posts.map((post) => (
-            <article
-              key={post.id}
-              style={{
-                backgroundColor: "#ffffff",
-                borderRadius: "12px",
-                padding: "12px 14px",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: "4px",
-                  fontSize: "12px",
-                  color: "#6b7280",
-                }}
-              >
-                <span>@{post.user}</span>
-                <span>{post.date}</span>
-              </div>
-              <p
-                style={{
-                  fontSize: "14px",
-                  lineHeight: 1.6,
-                  whiteSpace: "pre-wrap",
-                }}
-              >
-                {post.text}
-              </p>
-            </article>
-          ))}
-        </div>
-      </div>
-    </main>
-  );
-}
+        {/* 投稿フ*
