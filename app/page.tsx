@@ -1,42 +1,45 @@
 // app/page.tsx
+import Image from "next/image";
 
 type Post = {
   id: number;
   user: string;
   text: string;
   date: string;
+  imageSrc?: string;
 };
 
 const posts: Post[] = [
   {
     id: 1,
     user: "ochin",
+    text: "フライパンに絵を描いてみた！",
+    date: "2025-12-05",
+    imageSrc: "/pan-drawing.jpg",
+  },
+  {
+    id: 2,
+    user: "ochin",
     text: "これはテスト投稿です。SNS っぽい見た目だけ先に作ってみた。",
     date: "2025-01-01",
   },
   {
-    id: 2,
+    id: 3,
     user: "guest_user",
     text: "本当のデータベースはまだ無いけど、タイムラインごっこはできる。",
     date: "2025-01-02",
   },
   {
-    id: 3,
+    id: 4,
     user: "ochin",
     text: "そのうち投稿フォーム付けたり、ログインつけたりする予定（かもしれない）。",
     date: "2025-01-03",
   },
   {
-    id: 4,
+    id: 5,
     user: "someone",
     text: "とりあえず Vercel でデプロイできた時点で初心者卒業レベルではある。",
     date: "2025-01-04",
-  },
-  {
-    id: 5,
-    user: "ochin",
-    text: "意見は無いけど SNS は作る男。",
-    date: "2025-01-05",
   },
 ];
 
@@ -110,10 +113,31 @@ export default function HomePage() {
                   fontSize: "14px",
                   lineHeight: 1.6,
                   whiteSpace: "pre-wrap",
+                  marginBottom: post.imageSrc ? "12px" : "0",
                 }}
               >
                 {post.text}
               </p>
+              {post.imageSrc && (
+                <div
+                  style={{
+                    position: "relative",
+                    width: "100%",
+                    aspectRatio: "1",
+                    borderRadius: "8px",
+                    overflow: "hidden",
+                    backgroundColor: "#f3f4f6",
+                  }}
+                >
+                  <Image
+                    src={post.imageSrc}
+                    alt={post.text}
+                    fill
+                    style={{ objectFit: "cover" }}
+                    sizes="(max-width: 640px) 100vw, 640px"
+                  />
+                </div>
+              )}
             </article>
           ))}
         </div>
