@@ -1,7 +1,7 @@
 // app/page.tsx
 "use client";
 
-import { useEffect, useState, FormEvent } from "react";
+import { useState, FormEvent } from "react";
 
 type Post = {
   id: number;
@@ -47,27 +47,6 @@ export default function HomePage() {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [text, setText] = useState("");
 
-  // ブラウザの localStorage から保存済みの投稿を読み込む
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const saved = window.localStorage.getItem("ochin-sns-posts");
-      if (!saved) return;
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed)) {
-        setPosts(parsed);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }, []);
-
-  // 投稿が変わるたびに localStorage に保存
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    window.localStorage.setItem("ochin-sns-posts", JSON.stringify(posts));
-  }, [posts]);
-
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const trimmed = text.trim();
@@ -75,56 +54,4 @@ export default function HomePage() {
 
     const newPost: Post = {
       id: Date.now(),
-      user: "visitor", // ゲストは全部これでOK
-      text: trimmed,
-      date: new Date().toISOString().slice(0, 10),
-    };
-
-    // 新しい投稿を先頭に
-    setPosts([newPost, ...posts]);
-    setText("");
-  };
-
-  return (
-    <main
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#f3f4f6",
-        padding: "16px",
-        fontFamily: "-apple-system, BlinkMacSystemFont, system-ui, sans-serif",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "640px",
-          margin: "0 auto",
-        }}
-      >
-        <header
-          style={{
-            marginBottom: "16px",
-            paddingBottom: "8px",
-            borderBottom: "1px solid #e5e7eb",
-          }}
-        >
-          <h1
-            style={{
-              fontSize: "20px",
-              fontWeight: 700,
-            }}
-          >
-            おちんSNS（見た目＋その場投稿）
-          </h1>
-          <p
-            style={{
-              fontSize: "13px",
-              color: "#6b7280",
-              marginTop: "4px",
-            }}
-          >
-            投稿すると、このブラウザの中だけでタイムラインに追加されます。
-            他の人の画面にはまだ反映されない、ゆるいSNSごっこです。
-          </p>
-        </header>
-
-        {/* 投稿フ*
+      user: "visitor",
